@@ -11,7 +11,7 @@
 covid_metadata
 , содержащая информацию о пациентах, диагнозах и исследованиях.
 
-
+Датасет взят с публичного репозитория: https://github.com/ieee8023/covid-chestxray-dataset/tree/master
 
 Структура проекта
 
