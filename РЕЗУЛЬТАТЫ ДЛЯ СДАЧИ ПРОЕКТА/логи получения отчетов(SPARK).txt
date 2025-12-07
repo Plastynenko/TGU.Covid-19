@@ -1,0 +1,384 @@
+PS C:\Windows\system32> docker exec -it spark-master bash
+spark@32a6b789107e:/opt/spark/work-dir$ /opt/spark/bin/pyspark --master spark://spark-master:7077
+Python 3.8.10 (default, Nov 22 2023, 10:22:35)
+[GCC 9.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+25/12/04 12:24:45 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+25/12/04 12:24:46 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.5.1
+      /_/
+
+Using Python version 3.8.10 (default, Nov 22 2023 10:22:35)
+Spark context Web UI available at http://32a6b789107e:4041
+Spark context available as 'sc' (master = spark://spark-master:7077, app id = app-20251204122446-0003).
+SparkSession available as 'spark'.
+>>>
+>>> rdd = sc.parallelize(range(10))
+>>> rdd.sum()
+45
+>>> 25/12/04 12:25:42 ERROR StandaloneSchedulerBackend: Application has been killed. Reason: Master removed our application: KILLED
+25/12/04 12:25:42 ERROR Inbox: Ignoring error
+org.apache.spark.SparkException: Exiting due to error from cluster scheduler: Master removed our application: KILLED
+        at org.apache.spark.errors.SparkCoreErrors$.clusterSchedulerError(SparkCoreErrors.scala:291)
+        at org.apache.spark.scheduler.TaskSchedulerImpl.error(TaskSchedulerImpl.scala:981)
+        at org.apache.spark.scheduler.cluster.StandaloneSchedulerBackend.dead(StandaloneSchedulerBackend.scala:165)
+        at org.apache.spark.deploy.client.StandaloneAppClient$ClientEndpoint.markDead(StandaloneAppClient.scala:263)
+        at org.apache.spark.deploy.client.StandaloneAppClient$ClientEndpoint$$anonfun$receive$1.applyOrElse(StandaloneAppClient.scala:170)
+        at org.apache.spark.rpc.netty.Inbox.$anonfun$process$1(Inbox.scala:115)
+        at org.apache.spark.rpc.netty.Inbox.safelyCall(Inbox.scala:213)
+        at org.apache.spark.rpc.netty.Inbox.process(Inbox.scala:100)
+        at org.apache.spark.rpc.netty.MessageLoop.org$apache$spark$rpc$netty$MessageLoop$$receiveLoop(MessageLoop.scala:75)
+        at org.apache.spark.rpc.netty.MessageLoop$$anon$1.run(MessageLoop.scala:41)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+        at java.base/java.lang.Thread.run(Unknown Source)
+
+>>> pyspark --master local[*]
+  File "<stdin>", line 1
+    pyspark --master local[*]
+                     ^
+SyntaxError: invalid syntax
+>>>
+PS C:\Windows\system32> docker exec -it spark-master bash
+spark@32a6b789107e:/opt/spark/work-dir$ pyspark --master local[*]
+bash: pyspark: command not found
+spark@32a6b789107e:/opt/spark/work-dir$
+PS C:\Windows\system32>
+PS C:\Windows\system32> docker exec -it spark-master bash
+spark@32a6b789107e:/opt/spark/work-dir$ /opt/spark/bin/pyspark --master local[*]
+Python 3.8.10 (default, Nov 22 2023, 10:22:35)
+[GCC 9.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+25/12/04 12:28:19 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+25/12/04 12:28:20 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.5.1
+      /_/
+
+Using Python version 3.8.10 (default, Nov 22 2023 10:22:35)
+Spark context Web UI available at http://32a6b789107e:4041
+Spark context available as 'sc' (master = local[*], app id = local-1764851300437).
+SparkSession available as 'spark'.
+>>> from pyspark.sql import functions as F
+>>>
+>>> df = spark.read.parquet("hdfs://namenode:8020/covid_dataset/metadata/metadata_cleaned_spark.parquet")
+
+>>>
+>>> df.printSchema()
+root
+ |-- patientid: string (nullable = true)
+ |-- offset: double (nullable = true)
+ |-- sex: string (nullable = true)
+ |-- age: double (nullable = true)
+ |-- finding: string (nullable = true)
+ |-- RT_PCR_positive: string (nullable = true)
+ |-- survival: string (nullable = true)
+ |-- intubated: string (nullable = true)
+ |-- intubation_present: string (nullable = true)
+ |-- went_icu: string (nullable = true)
+ |-- in_icu: string (nullable = true)
+ |-- needed_supplemental_O2: string (nullable = true)
+ |-- extubated: string (nullable = true)
+ |-- temperature: double (nullable = true)
+ |-- pO2_saturation: double (nullable = true)
+ |-- leukocyte_count: double (nullable = true)
+ |-- neutrophil_count: double (nullable = true)
+ |-- lymphocyte_count: double (nullable = true)
+ |-- view: string (nullable = true)
+ |-- modality: string (nullable = true)
+ |-- date: timestamp_ntz (nullable = true)
+ |-- location: string (nullable = true)
+ |-- folder: string (nullable = true)
+ |-- filename: string (nullable = true)
+ |-- doi: string (nullable = true)
+ |-- url: string (nullable = true)
+ |-- license: string (nullable = true)
+ |-- clinical_notes: string (nullable = true)
+ |-- other_notes: string (nullable = true)
+ |-- finding_clean: string (nullable = true)
+ |-- age_group: string (nullable = true)
+ |-- age_category: string (nullable = true)
+
+>>> df.show(5)
+25/12/04 12:28:37 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
++---------+------+---+----+--------------------+---------------+--------+---------+------------------+--------+------+----------------------+---------+-----------+--------------+---------------+----------------+----------------+----+--------+-------------------+--------------------+------+--------------------+--------------------+--------------------+-------+--------------------+-----------+-------------+---------+------------+
+|patientid|offset|sex| age|             finding|RT_PCR_positive|survival|intubated|intubation_present|went_icu|in_icu|needed_supplemental_O2|extubated|temperature|pO2_saturation|leukocyte_count|neutrophil_count|lymphocyte_count|view|modality|               date|            location|folder|            filename|                 doi|                 url|license|      clinical_notes|other_notes|finding_clean|age_group|age_category|
++---------+------+---+----+--------------------+---------------+--------+---------+------------------+--------+------+----------------------+---------+-----------+--------------+---------------+----------------+----------------+----+--------+-------------------+--------------------+------+--------------------+--------------------+--------------------+-------+--------------------+-----------+-------------+---------+------------+
+|        2|   0.0|  M|65.0|Pneumonia/Viral/C...|              Y|       Y|        N|                 N|       N|     N|                     Y|     NULL|       NULL|          NULL|           NULL|            NULL|            NULL|  PA|   X-ray|2020-01-22 00:00:00|Cho Ray Hospital,...|images|auntminnie-a-2020...|10.1056/nejmc2001272|https://www.nejm....|   NULL|On January 22, 20...|       NULL|     COVID-19|   senior|         old|
+|        2|   3.0|  M|65.0|Pneumonia/Viral/C...|              Y|       Y|        N|                 N|       N|     N|                     Y|     NULL|       NULL|          NULL|           NULL|            NULL|            NULL|  PA|   X-ray|2020-01-25 00:00:00|Cho Ray Hospital,...|images|auntminnie-b-2020...|10.1056/nejmc2001272|https://www.nejm....|   NULL|On January 22, 20...|       NULL|     COVID-19|   senior|         old|
+|        2|   5.0|  M|65.0|Pneumonia/Viral/C...|              Y|       Y|        N|                 N|       N|     N|                     Y|     NULL|       NULL|          NULL|           NULL|            NULL|            NULL|  PA|   X-ray|2020-01-27 00:00:00|Cho Ray Hospital,...|images|auntminnie-c-2020...|10.1056/nejmc2001272|https://www.nejm....|   NULL|On January 22, 20...|       NULL|     COVID-19|   senior|         old|
+|        2|   6.0|  M|65.0|Pneumonia/Viral/C...|              Y|       Y|        N|                 N|       N|     N|                     Y|     NULL|       NULL|          NULL|           NULL|            NULL|            NULL|  PA|   X-ray|2020-01-28 00:00:00|Cho Ray Hospital,...|images|auntminnie-d-2020...|10.1056/nejmc2001272|https://www.nejm....|   NULL|On January 22, 20...|       NULL|     COVID-19|   senior|         old|
+|        4|   0.0|  F|52.0|Pneumonia/Viral/C...|              Y|    NULL|        N|                 N|       N|     N|                     N|     NULL|       NULL|          NULL|           NULL|            NULL|            NULL|  PA|   X-ray|2020-01-25 00:00:00|Changhua Christia...|images|nejmc2001573_f1a....|10.1056/NEJMc2001573|https://www.nejm....|   NULL|diffuse infiltrat...|       NULL|     COVID-19|    adult|      middle|
++---------+------+---+----+--------------------+---------------+--------+---------+------------------+--------+------+----------------------+---------+-----------+--------------+---------------+----------------+----------------+----+--------+-------------------+--------------------+------+--------------------+--------------------+--------------------+-------+--------------------+-----------+-------------+---------+------------+
+only showing top 5 rows
+
+>>> df.createOrReplaceTempView("covid_metadata")
+>>>
+>>> spark.sql("""
+...     SELECT finding_clean,
+...            COUNT(*) AS cnt
+...     FROM covid_metadata
+...     GROUP BY finding_clean
+...     ORDER BY cnt DESC
+... """).show()
++-------------+---+
+|finding_clean|cnt|
++-------------+---+
+|     COVID-19|584|
+|    Pneumonia|226|
+|      Unknown| 84|
+|   No finding| 22|
+| Tuberculosis| 18|
+|         SARS| 16|
++-------------+---+
+
+>>>
+>>> spark.sql("""
+...     SELECT age_category,
+...            finding_clean,
+...            COUNT(*) AS cnt
+...     FROM covid_metadata
+...     GROUP BY age_category, finding_clean
+...     ORDER BY age_category, cnt DESC
+... """).show(50)
++------------+-------------+---+
+|age_category|finding_clean|cnt|
++------------+-------------+---+
+|      middle|     COVID-19|341|
+|      middle|    Pneumonia|143|
+|      middle|      Unknown| 84|
+|      middle|   No finding| 11|
+|      middle| Tuberculosis|  9|
+|      middle|         SARS|  3|
+|         old|     COVID-19|210|
+|         old|    Pneumonia| 66|
+|         old|   No finding|  8|
+|         old|         SARS|  7|
+|         old| Tuberculosis|  2|
+|       young|     COVID-19| 33|
+|       young|    Pneumonia| 17|
+|       young| Tuberculosis|  7|
+|       young|         SARS|  6|
+|       young|   No finding|  3|
++------------+-------------+---+
+
+>>> spark.sql("""
+...     SELECT finding_clean,
+...            ROUND(AVG(age), 1) AS avg_age,
+...            COUNT(*) AS cnt
+...     FROM covid_metadata
+...     GROUP BY finding_clean
+...     HAVING cnt >= 10
+...     ORDER BY avg_age
+... """).show()
++-------------+-------+---+
+|finding_clean|avg_age|cnt|
++-------------+-------+---+
+| Tuberculosis|   43.1| 18|
+|    Pneumonia|   49.2|226|
+|         SARS|   50.1| 16|
+|   No finding|   52.5| 22|
+|      Unknown|   54.0| 84|
+|     COVID-19|   55.8|584|
++-------------+-------+---+
+
+>>>
+>>> # 1) Выбрать только COVID-19 и нужные колонки
+>>> covid_df = df.filter(df.finding_clean == "COVID-19") \
+...              .select("patientid", "sex", "age", "age_category",
+...                      "RT_PCR_positive", "survival", "date", "location")
+>>>
+>>> covid_df.show(5)
++---------+---+----+------------+---------------+--------+-------------------+--------------------+
+|patientid|sex| age|age_category|RT_PCR_positive|survival|               date|            location|
++---------+---+----+------------+---------------+--------+-------------------+--------------------+
+|        2|  M|65.0|         old|              Y|       Y|2020-01-22 00:00:00|Cho Ray Hospital,...|
+|        2|  M|65.0|         old|              Y|       Y|2020-01-25 00:00:00|Cho Ray Hospital,...|
+|        2|  M|65.0|         old|              Y|       Y|2020-01-27 00:00:00|Cho Ray Hospital,...|
+|        2|  M|65.0|         old|              Y|       Y|2020-01-28 00:00:00|Cho Ray Hospital,...|
+|        4|  F|52.0|      middle|              Y|    NULL|2020-01-25 00:00:00|Changhua Christia...|
++---------+---+----+------------+---------------+--------+-------------------+--------------------+
+only showing top 5 rows
+
+>>>
+>>> # 2) Посчитать число случаев по датам (для последующей визуализации в Python)
+>>> by_date = covid_df.groupBy("date").count().orderBy("date")
+>>> by_date.show(10)
++-------------------+-----+
+|               date|count|
++-------------------+-----+
+|               NULL|  528|
+|2019-12-27 00:00:00|    1|
+|2019-12-29 00:00:00|    2|
+|2019-12-30 00:00:00|    1|
+|2020-01-01 00:00:00|    2|
+|2020-01-06 00:00:00|    1|
+|2020-01-10 00:00:00|    1|
+|2020-01-12 00:00:00|    1|
+|2020-01-19 00:00:00|    2|
+|2020-01-20 00:00:00|    1|
++-------------------+-----+
+only showing top 10 rows
+
+>>>
+>>> # 3) Сохранить результат обратно в HDFS в parquet
+>>> by_date.write.mode("overwrite").parquet(
+...     "hdfs://namenode:8020/covid_dataset/analytics/cases_by_date"
+... )
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/opt/spark/python/pyspark/sql/readwriter.py", line 1721, in parquet
+    self._jwrite.parquet(path)
+  File "/opt/spark/python/lib/py4j-0.10.9.7-src.zip/py4j/java_gateway.py", line 1322, in __call__
+  File "/opt/spark/python/pyspark/errors/exceptions/captured.py", line 179, in deco
+    return f(*a, **kw)
+  File "/opt/spark/python/lib/py4j-0.10.9.7-src.zip/py4j/protocol.py", line 326, in get_return_value
+py4j.protocol.Py4JJavaError: An error occurred while calling o76.parquet.
+: org.apache.hadoop.security.AccessControlException: Permission denied: user=spark, access=WRITE, inode="/covid_dataset":root:supergroup:drwxr-xr-x
+        at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:317)
+        at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:223)
+        at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:199)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1752)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1736)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1719)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:69)
+        at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:3861)
+        at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:984)
+        at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:634)
+        at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+        at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:616)
+        at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)
+        at org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2217)
+        at org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2213)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at javax.security.auth.Subject.doAs(Subject.java:422)
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1746)
+        at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2213)
+
+        at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+        at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+        at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source)
+        at org.apache.hadoop.ipc.RemoteException.instantiateException(RemoteException.java:121)
+        at org.apache.hadoop.ipc.RemoteException.unwrapRemoteException(RemoteException.java:88)
+        at org.apache.hadoop.hdfs.DFSClient.primitiveMkdir(DFSClient.java:2509)
+        at org.apache.hadoop.hdfs.DFSClient.mkdirs(DFSClient.java:2483)
+        at org.apache.hadoop.hdfs.DistributedFileSystem$27.doCall(DistributedFileSystem.java:1485)
+        at org.apache.hadoop.hdfs.DistributedFileSystem$27.doCall(DistributedFileSystem.java:1482)
+        at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java:81)
+        at org.apache.hadoop.hdfs.DistributedFileSystem.mkdirsInternal(DistributedFileSystem.java:1499)
+        at org.apache.hadoop.hdfs.DistributedFileSystem.mkdirs(DistributedFileSystem.java:1474)
+        at org.apache.hadoop.fs.FileSystem.mkdirs(FileSystem.java:2388)
+        at org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter.setupJob(FileOutputCommitter.java:356)
+        at org.apache.spark.internal.io.HadoopMapReduceCommitProtocol.setupJob(HadoopMapReduceCommitProtocol.scala:188)
+        at org.apache.spark.sql.execution.datasources.FileFormatWriter$.writeAndCommit(FileFormatWriter.scala:269)
+        at org.apache.spark.sql.execution.datasources.FileFormatWriter$.executeWrite(FileFormatWriter.scala:304)
+        at org.apache.spark.sql.execution.datasources.FileFormatWriter$.write(FileFormatWriter.scala:190)
+        at org.apache.spark.sql.execution.datasources.InsertIntoHadoopFsRelationCommand.run(InsertIntoHadoopFsRelationCommand.scala:190)
+        at org.apache.spark.sql.execution.command.DataWritingCommandExec.sideEffectResult$lzycompute(commands.scala:113)
+        at org.apache.spark.sql.execution.command.DataWritingCommandExec.sideEffectResult(commands.scala:111)
+        at org.apache.spark.sql.execution.command.DataWritingCommandExec.executeCollect(commands.scala:125)
+        at org.apache.spark.sql.execution.adaptive.AdaptiveSparkPlanExec.$anonfun$executeCollect$1(AdaptiveSparkPlanExec.scala:390)
+        at org.apache.spark.sql.execution.adaptive.AdaptiveSparkPlanExec.withFinalPlanUpdate(AdaptiveSparkPlanExec.scala:418)
+        at org.apache.spark.sql.execution.adaptive.AdaptiveSparkPlanExec.executeCollect(AdaptiveSparkPlanExec.scala:390)
+        at org.apache.spark.sql.execution.QueryExecution$$anonfun$eagerlyExecuteCommands$1.$anonfun$applyOrElse$1(QueryExecution.scala:107)
+        at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$6(SQLExecution.scala:125)
+        at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:201)
+        at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$1(SQLExecution.scala:108)
+        at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+        at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:66)
+        at org.apache.spark.sql.execution.QueryExecution$$anonfun$eagerlyExecuteCommands$1.applyOrElse(QueryExecution.scala:107)
+        at org.apache.spark.sql.execution.QueryExecution$$anonfun$eagerlyExecuteCommands$1.applyOrElse(QueryExecution.scala:98)
+        at org.apache.spark.sql.catalyst.trees.TreeNode.$anonfun$transformDownWithPruning$1(TreeNode.scala:461)
+        at org.apache.spark.sql.catalyst.trees.CurrentOrigin$.withOrigin(origin.scala:76)
+        at org.apache.spark.sql.catalyst.trees.TreeNode.transformDownWithPruning(TreeNode.scala:461)
+        at org.apache.spark.sql.catalyst.plans.logical.LogicalPlan.org$apache$spark$sql$catalyst$plans$logical$AnalysisHelper$$super$transformDownWithPruning(LogicalPlan.scala:32)
+        at org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.transformDownWithPruning(AnalysisHelper.scala:267)
+        at org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.transformDownWithPruning$(AnalysisHelper.scala:263)
+        at org.apache.spark.sql.catalyst.plans.logical.LogicalPlan.transformDownWithPruning(LogicalPlan.scala:32)
+        at org.apache.spark.sql.catalyst.plans.logical.LogicalPlan.transformDownWithPruning(LogicalPlan.scala:32)
+        at org.apache.spark.sql.catalyst.trees.TreeNode.transformDown(TreeNode.scala:437)
+        at org.apache.spark.sql.execution.QueryExecution.eagerlyExecuteCommands(QueryExecution.scala:98)
+        at org.apache.spark.sql.execution.QueryExecution.commandExecuted$lzycompute(QueryExecution.scala:85)
+        at org.apache.spark.sql.execution.QueryExecution.commandExecuted(QueryExecution.scala:83)
+        at org.apache.spark.sql.execution.QueryExecution.assertCommandExecuted(QueryExecution.scala:142)
+        at org.apache.spark.sql.DataFrameWriter.runCommand(DataFrameWriter.scala:859)
+        at org.apache.spark.sql.DataFrameWriter.saveToV1Source(DataFrameWriter.scala:388)
+        at org.apache.spark.sql.DataFrameWriter.saveInternal(DataFrameWriter.scala:361)
+        at org.apache.spark.sql.DataFrameWriter.save(DataFrameWriter.scala:240)
+        at org.apache.spark.sql.DataFrameWriter.parquet(DataFrameWriter.scala:792)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+        at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+        at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+        at py4j.Gateway.invoke(Gateway.java:282)
+        at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+        at py4j.commands.CallCommand.execute(CallCommand.java:79)
+        at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:182)
+        at py4j.ClientServerConnection.run(ClientServerConnection.java:106)
+        at java.base/java.lang.Thread.run(Unknown Source)
+Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.AccessControlException): Permission denied: user=spark, access=WRITE, inode="/covid_dataset":root:supergroup:drwxr-xr-x
+        at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:317)
+        at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:223)
+        at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:199)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1752)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1736)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1719)
+        at org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:69)
+        at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:3861)
+        at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:984)
+        at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:634)
+        at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+        at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:616)
+        at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)
+        at org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2217)
+        at org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2213)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at javax.security.auth.Subject.doAs(Subject.java:422)
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1746)
+        at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2213)
+
+        at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java:1612)
+        at org.apache.hadoop.ipc.Client.call(Client.java:1558)
+        at org.apache.hadoop.ipc.Client.call(Client.java:1455)
+        at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java:242)
+        at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java:129)
+        at com.sun.proxy.$Proxy35.mkdirs(Unknown Source)
+        at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.mkdirs(ClientNamenodeProtocolTranslatorPB.java:674)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+        at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java:422)
+        at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java:165)
+        at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java:157)
+        at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java:95)
+        at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:359)
+        at com.sun.proxy.$Proxy36.mkdirs(Unknown Source)
+        at org.apache.hadoop.hdfs.DFSClient.primitiveMkdir(DFSClient.java:2507)
+        ... 57 more
+
+>>>>>> covid_df.show(5)
++---------+---+----+------------+---------------+--------+-------------------+--------------------+
+|patientid|sex| age|age_category|RT_PCR_positive|survival|               date|            location|
++---------+---+----+------------+---------------+--------+-------------------+--------------------+
+|        2|  M|65.0|         old|              Y|       Y|2020-01-22 00:00:00|Cho Ray Hospital,...|
+|        2|  M|65.0|         old|              Y|       Y|2020-01-25 00:00:00|Cho Ray Hospital,...|
+|        2|  M|65.0|         old|              Y|       Y|2020-01-27 00:00:00|Cho Ray Hospital,...|
+|        2|  M|65.0|         old|              Y|       Y|2020-01-28 00:00:00|Cho Ray Hospital,...|
+|        4|  F|52.0|      middle|              Y|    NULL|2020-01-25 00:00:00|Changhua Christia...|
++---------+---+----+------------+---------------+--------+-------------------+--------------------+
+only showing top 5 rows
